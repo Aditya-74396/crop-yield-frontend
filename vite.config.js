@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/crop-yield-frontend/'
+  base: '/',
+  server: {
+    port: 5173,
+  },
 })
 

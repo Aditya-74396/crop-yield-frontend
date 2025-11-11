@@ -91,8 +91,8 @@ const handleSubmit = async (e) => {
     navigate('/signin')
   }
 
-  const states = ['Maharashtra', 'Punjab', 'Haryana', 'Uttar Pradesh', 'Rajasthan', 'Gujarat', 'Karnataka', 'Tamil Nadu']
-  const crops = ['Wheat', 'Rice', 'Corn', 'Soybean', 'Cotton', 'Sugarcane', 'Potato', 'Tomato']
+  const states = ['Andhra Pradesh', 'Arunachal Pradesh','Andaman and Nicobar Islands', 'Assam', 'Bihar', 'Chhattisgarh', 'Chandigarh', 'Delhi', 'Dadra and Nagar Haveli and Daman', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand','Jammu and Kashmir', 'Karnataka', 'Kerala','Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Puducherry', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal']
+  const crops = ['Rice', 'Maize', 'Jowar', 'Bajra', 'Cotton', 'Soybean', 'Sugarcane', 'Groundnut', 'Arhar (Tur)', 'Moong', 'Urad', 'Sesame', 'Castor Seed', 'Wheat', 'Barley', 'Mustard', 'Gram (Chickpea)', 'Lentil (Masoor)', 'Pea', 'Oat', 'Linseed', 'Watermelon', 'Muskmelon', 'Cucumber', 'Bitter Gourd', 'Pumpkin', 'Ridge Gourd', 'Tomato', 'Okra (Bhindi)',   'Sugarcane', 'Banana', 'Coconut', 'Papaya', 'Guava', 'Turmeric', 'Ginger']
   const seasons = ['Kharif', 'Rabi', 'Zaid', 'Whole Year']
 
   return (
@@ -330,7 +330,7 @@ const handleSubmit = async (e) => {
           <h3 className="footer-title">Contact Us</h3>
           <div className="contact-info">
             <p><strong>Name:</strong> Alpha</p>
-            <p><strong>Email:</strong> <a href="mailto:alphanit4@gmail.com">alphanit4@gmail.com</a></p>
+            <p><strong>Email:</strong> <a href="mailto:aalphanit44@gmail.com">aalphanit44@gmail.com</a></p>
           </div>
           <p className="footer-copyright">© 2024 YieldVision. All rights reserved.</p>
         </div>

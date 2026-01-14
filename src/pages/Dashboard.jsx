@@ -10,15 +10,13 @@ function Dashboard({ onLogout }) {
     district: '',
     area: '',
     cropType: '',
-    season: '',
     rainfall: '',
     temperature: '',
-    nitrogen: '',
-    phosphorus: '',
-    potassium: ''
+    nitrogen: ''
   })
   const [predictedYield, setPredictedYield] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   // Sample historical data for visualization
   const historicalData = [
@@ -37,63 +35,63 @@ function Dashboard({ onLogout }) {
     })
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
+    setPredictedYield(null)
 
-const [error, setError] = useState(null);
+    try {
+      const response = await fetch("https://crop-yield-backend-1-epnh.onrender.com/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          area: parseFloat(formData.area),
+          average_rain_fall_mm_per_year: parseFloat(formData.rainfall),
+          pesticides_tonnes: parseFloat(formData.nitrogen),
+          avg_temp: parseFloat(formData.temperature),
+          crop: formData.cropType,
+          state: formData.state,
+          district: formData.district
+        }),
+      })
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError(null);
-  setPredictedYield(null);
+      if (!response.ok) throw new Error("Backend error")
+      const data = await response.json()
 
-  console.log("Submitting form:", formData);
-
-  try {
-    const response = await fetch("https://crop-yield-backend-1-epnh.onrender.com/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        average_rainfall: parseFloat(formData.rainfall),
-        pesticides_tonnes: parseFloat(formData.nitrogen),
-        avg_temp: parseFloat(formData.temperature),
-        area: parseFloat(formData.area),
-        crop: formData.cropType, // ✅ FIXED
-        season: formData.season,
-        state: formData.state,
-        district: formData.district,
-        phosphorus: parseFloat(formData.phosphorus),
-        potassium: parseFloat(formData.potassium),
-      }),
-    });
-
-    if (!response.ok) throw new Error("Backend error");
-    const data = await response.json();
-
-    if (data.predicted_yield > 500)
-      setPredictedYield("Unrealistic result — check input values or model.");
-    else
-      setPredictedYield(Number(data.predicted_yield).toFixed(2));
-    
-  } catch (err) {
-    console.error("Prediction error:", err);
-    setError("Failed to get prediction. Check backend connection or input values.");
-  } finally {
-    setIsLoading(false);
+      if (data.predicted_yield > 500) {
+        setPredictedYield("Unrealistic result — check input values or model.")
+      } else {
+        setPredictedYield(Number(data.predicted_yield).toFixed(2))
+      }
+    } catch (err) {
+      console.error("Prediction error:", err)
+      setError("Failed to get prediction. Check backend connection or input values.")
+    } finally {
+      setIsLoading(false)
+    }
   }
-};
-
-
 
   const handleLogout = () => {
-    if (onLogout) {
-      onLogout()
-    }
+    if (onLogout) onLogout()
     navigate('/signin')
   }
 
-  const states = ['Andhra Pradesh', 'Arunachal Pradesh','Andaman and Nicobar Islands', 'Assam', 'Bihar', 'Chhattisgarh', 'Chandigarh', 'Delhi', 'Dadra and Nagar Haveli and Daman', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand','Jammu and Kashmir', 'Karnataka', 'Kerala','Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Puducherry', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal']
-  const crops = ['Rice', 'Maize', 'Jowar', 'Bajra', 'Cotton', 'Soybean', 'Sugarcane', 'Groundnut', 'Arhar (Tur)', 'Moong', 'Urad', 'Sesame', 'Castor Seed', 'Wheat', 'Barley', 'Mustard', 'Gram (Chickpea)', 'Lentil (Masoor)', 'Pea', 'Oat', 'Linseed', 'Watermelon', 'Muskmelon', 'Cucumber', 'Bitter Gourd', 'Pumpkin', 'Ridge Gourd', 'Tomato', 'Okra (Bhindi)',   'Sugarcane', 'Banana', 'Coconut', 'Papaya', 'Guava', 'Turmeric', 'Ginger']
-  const seasons = ['Kharif', 'Rabi', 'Zaid', 'Whole Year']
+  const states = [
+    'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa',
+    'Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala',
+    'Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland',
+    'Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura',
+    'Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Jammu & Kashmir',
+    'Ladakh','Puducherry','Chandigarh','Dadra & Nagar Haveli','Daman & Diu'
+  ]
+
+  const crops = [
+    'Rice','Maize','Jowar','Bajra','Cotton','Soybean','Sugarcane','Groundnut','Arhar (Tur)','Moong','Urad','Sesame','Castor Seed',
+    'Wheat','Barley','Mustard','Gram (Chickpea)','Lentil (Masoor)','Pea','Oat','Linseed',
+    'Watermelon','Muskmelon','Cucumber','Bitter Gourd','Pumpkin','Ridge Gourd','Tomato','Okra (Bhindi)',
+    'Banana','Coconut','Papaya','Guava','Turmeric','Ginger'
+  ]
 
   return (
     <div className="dashboard-container">
@@ -106,11 +104,8 @@ const handleSubmit = async (e) => {
 
       <main className="dashboard-main">
         <div className="dashboard-content">
-          {/* Data Input Section */}
           <section className="input-section">
             <h2 className="section-title">Crop Yield Prediction</h2>
-            <p className="section-subtitle">Enter the details below to predict crop yield</p>
-            
             <form onSubmit={handleSubmit} className="prediction-form">
               <div className="form-row">
                 <div className="form-group">
@@ -123,12 +118,9 @@ const handleSubmit = async (e) => {
                     required
                   >
                     <option value="">Select State</option>
-                    {states.map(state => (
-                      <option key={state} value={state}>{state}</option>
-                    ))}
+                    {states.map(state => <option key={state} value={state}>{state}</option>)}
                   </select>
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="district">District</label>
                   <input
@@ -153,12 +145,10 @@ const handleSubmit = async (e) => {
                     value={formData.area}
                     onChange={handleChange}
                     required
-                    placeholder="Enter area in hectares"
                     min="0"
                     step="0.01"
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="cropType">Crop Type</label>
                   <select
@@ -169,30 +159,12 @@ const handleSubmit = async (e) => {
                     required
                   >
                     <option value="">Select Crop</option>
-                    {crops.map(crop => (
-                      <option key={crop} value={crop}>{crop}</option>
-                    ))}
+                    {crops.map(crop => <option key={crop} value={crop}>{crop}</option>)}
                   </select>
                 </div>
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="season">Season</label>
-                  <select
-                    id="season"
-                    name="season"
-                    value={formData.season}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select Season</option>
-                    {seasons.map(season => (
-                      <option key={season} value={season}>{season}</option>
-                    ))}
-                  </select>
-                </div>
-
                 <div className="form-group">
                   <label htmlFor="rainfall">Rainfall (mm)</label>
                   <input
@@ -202,14 +174,10 @@ const handleSubmit = async (e) => {
                     value={formData.rainfall}
                     onChange={handleChange}
                     required
-                    placeholder="Enter rainfall in mm"
                     min="0"
                     step="0.1"
                   />
                 </div>
-              </div>
-
-              <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="temperature">Temperature (°C)</label>
                   <input
@@ -219,22 +187,6 @@ const handleSubmit = async (e) => {
                     value={formData.temperature}
                     onChange={handleChange}
                     required
-                    placeholder="Enter temperature"
-                    min="0"
-                    step="0.1"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="nitrogen">Nitrogen (N) - kg/hectare</label>
-                  <input
-                    type="number"
-                    id="nitrogen"
-                    name="nitrogen"
-                    value={formData.nitrogen}
-                    onChange={handleChange}
-                    required
-                    placeholder="Enter N level"
                     min="0"
                     step="0.1"
                   />
@@ -243,96 +195,62 @@ const handleSubmit = async (e) => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="phosphorus">Phosphorus (P) - kg/hectare</label>
+                  <label htmlFor="nitrogen">Pesticides (Tonnes)</label>
                   <input
                     type="number"
-                    id="phosphorus"
-                    name="phosphorus"
-                    value={formData.phosphorus}
+                    id="nitrogen"
+                    name="nitrogen"
+                    value={formData.nitrogen}
                     onChange={handleChange}
                     required
-                    placeholder="Enter P level"
                     min="0"
-                    step="0.1"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="potassium">Potassium (K) - kg/hectare</label>
-                  <input
-                    type="number"
-                    id="potassium"
-                    name="potassium"
-                    value={formData.potassium}
-                    onChange={handleChange}
-                    required
-                    placeholder="Enter K level"
-                    min="0"
-                    step="0.1"
+                    step="0.01"
                   />
                 </div>
               </div>
-              
-                {/* your input fields */}
-                <button type="submit" className="predict-button" disabled={isLoading}>
-                  {isLoading ? 'Predicting...' : 'Predict Yield'}
-                </button>
-                  
-              </form>  
+
+              <button type="submit" className="predict-button" disabled={isLoading}>
+                {isLoading ? 'Predicting...' : 'Predict Yield'}
+              </button>
+              {error && <p className="error-text">{error}</p>}
+            </form>
           </section>
 
-          {/* Prediction Result Section */}
           {predictedYield && (
             <section className="prediction-section">
               <h2 className="section-title">Predicted Yield</h2>
               <div className="prediction-card">
                 <div className="yield-value">{predictedYield}</div>
-                <div className="yield-unit">Quintals/Hectare</div>
+                <div className="yield-unit">hg/ha</div>
                 <div className="prediction-details">
                   <p><strong>Crop:</strong> {formData.cropType}</p>
                   <p><strong>Location:</strong> {formData.district}, {formData.state}</p>
-                  <p><strong>Season:</strong> {formData.season}</p>
                 </div>
               </div>
             </section>
           )}
 
-          {/* Historical Data Section */}
           <section className="historical-section">
             <h2 className="section-title">Historical Yield Data</h2>
-            <p className="section-subtitle">Yield trends over the years</p>
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={historicalData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis label={{ value: 'Yield (Quintals/Hectare)', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="yield" 
-                    stroke="#11998e" 
-                    strokeWidth={3}
-                    name="Yield (Q/Ha)"
-                    dot={{ fill: '#38ef7d', r: 5 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={historicalData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis label={{ value: 'Yield (hg/ha)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="yield" stroke="#11998e" strokeWidth={3} dot={{ r: 5 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </section>
         </div>
       </main>
 
-      {/* Contact Us Section */}
       <footer className="contact-footer">
         <div className="footer-content">
           <h3 className="footer-title">Contact Us</h3>
-          <div className="contact-info">
-            <p><strong>Name:</strong> Alpha</p>
-            <p><strong>Email:</strong> <a href="mailto:aalphanit44@gmail.com">aalphanit44@gmail.com</a></p>
-          </div>
-          <p className="footer-copyright">© 2024 YieldVision. All rights reserved.</p>
+          <p><strong>Email:</strong> <a href="mailto:alphanit44@gmail.com">alphanit44@gmail.com</a></p>
+          <p>© 2026 YieldVision. All rights reserved.</p>
         </div>
       </footer>
     </div>
@@ -340,4 +258,3 @@ const handleSubmit = async (e) => {
 }
 
 export default Dashboard
-
